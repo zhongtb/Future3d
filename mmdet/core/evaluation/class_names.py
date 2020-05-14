@@ -89,13 +89,30 @@ def cityscapes_classes():
     ]
 
 
+# ck修改
+def Future3d_classes():
+    return [
+        'Children Cabinet', 'Nightstand', 'Bookcase / jewelry Armoire', 'Wardrobe',
+        'Tea Table', 'Corner/Side Table', 'Sideboard / Side Cabinet / Console',
+        'Wine Cooler', 'TV Stand', 'Drawer Chest / Corner cabinet', 'Shelf',
+        'Round End Table', 'Double Bed', 'Bunk Bed', 'Bed Frame', 'Single bed',
+        'Kids Bed', 'Dining Chair', 'Lounge Chair / Book-chair / Computer Chair',
+        'Dressing Chair', 'Classic Chinese Chair', 'Barstool', 'Dressing Table',
+        'Dining Table', 'Desk', 'Three-Seat / Multi-person sofa', 'armchair',
+        'Two-seat Sofa', 'L-shaped Sofa', 'Lazy Sofa', 'Chaise Longue Sofa',
+        'Footstool / Sofastool / Bed End Stool / Stool', 'Pendant Lamp', 'Ceiling Lamp'
+    ]
+
+
 dataset_aliases = {
     'voc': ['voc', 'pascal_voc', 'voc07', 'voc12'],
     'imagenet_det': ['det', 'imagenet_det', 'ilsvrc_det'],
     'imagenet_vid': ['vid', 'imagenet_vid', 'ilsvrc_vid'],
     'coco': ['coco', 'mscoco', 'ms_coco'],
     'wider_face': ['WIDERFaceDataset', 'wider_face', 'WDIERFace'],
-    'cityscapes': ['cityscapes']
+    'cityscapes': ['cityscapes'],
+    # ck修改
+    'future3d': ['future3d']
 }
 
 

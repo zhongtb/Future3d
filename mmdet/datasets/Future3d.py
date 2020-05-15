@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-#coding=utf-8
-=======
 # coding=utf-8
 # ck修改
->>>>>>> shuang
 import itertools
 import logging
 import os.path as osp
@@ -21,15 +17,8 @@ from .builder import DATASETS
 from .custom import CustomDataset
 
 
-<<<<<<< HEAD
-
 @DATASETS.register_module
 class Future3dDataset(CustomDataset):
-
-=======
-@DATASETS.register_module
-class Future3dDataset(CustomDataset):
->>>>>>> shuang
     '''
     CLASSES = ('person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
                'train', 'truck', 'boat', 'traffic_light', 'fire_hydrant',
@@ -49,15 +38,6 @@ class Future3dDataset(CustomDataset):
     # 我把fine-grained category name搬了过来
     CLASSES = (
         'Children Cabinet', 'Nightstand', 'Bookcase / jewelry Armoire', 'Wardrobe',
-<<<<<<< HEAD
-        'Tea Table', 'Corner/Side Table', 'Sideboard / Side Cabinet / Console', 
-        'Wine Cooler', 'TV Stand', 'Drawer Chest / Corner cabinet', 'Shelf', 
-        'Round End Table', 'Double Bed', 'Bunk Bed', 'Bed Frame', 'Single bed', 
-        'Kids Bed', 'Dining Chair', 'Lounge Chair / Book-chair / Computer Chair', 
-        'Dressing Chair', 'Classic Chinese Chair', 'Barstool', 'Dressing Table', 
-        'Dining Table', 'Desk', 'Three-Seat / Multi-person sofa', 'armchair',
-        'Two-seat Sofa', 'L-shaped Sofa', 'Lazy Sofa', 'Chaise Longue Sofa', 
-=======
         'Tea Table', 'Corner/Side Table', 'Sideboard / Side Cabinet / Console',
         'Wine Cooler', 'TV Stand', 'Drawer Chest / Corner cabinet', 'Shelf',
         'Round End Table', 'Double Bed', 'Bunk Bed', 'Bed Frame', 'Single bed',
@@ -65,71 +45,11 @@ class Future3dDataset(CustomDataset):
         'Dressing Chair', 'Classic Chinese Chair', 'Barstool', 'Dressing Table',
         'Dining Table', 'Desk', 'Three-Seat / Multi-person sofa', 'armchair',
         'Two-seat Sofa', 'L-shaped Sofa', 'Lazy Sofa', 'Chaise Longue Sofa',
->>>>>>> shuang
         'Footstool / Sofastool / Bed End Stool / Stool', 'Pendant Lamp', 'Ceiling Lamp'
     )
 
     # devkit/dataset_category.py，起到str和int的映射关系，网络输出int，注释是str，我觉得这几个list都可以改写成{'Modern':0, 'Chinoiserie':1, ...}的形式，更方便查找！
     _ATTR_STYLE = [
-<<<<<<< HEAD
-        {'id': 0, 'category': 'Modern',},
-        {'id': 1, 'category': 'Chinoiserie',},
-        {'id': 2, 'category': 'Kids',},
-        {'id': 3, 'category': 'European',},
-        {'id': 4, 'category': 'Japanese',},
-        {'id': 5, 'category': 'Southeast Asia',},
-        {'id': 6, 'category': 'Industrial',},
-        {'id': 7, 'category': 'American Country',},
-        {'id': 8, 'category': 'Vintage/Retro',},
-        {'id': 9, 'category': 'Light Luxury',},
-        {'id': 10, 'category': 'Mediterranean',},
-        {'id': 11, 'category': 'Korean',},
-        {'id': 12, 'category': 'New Chinese',},
-        {'id': 13, 'category': 'Nordic',},
-        {'id': 14, 'category': 'European Classic',},
-        {'id': 15, 'category': 'Others',},
-        {'id': 16, 'category': 'Ming Qing',},
-        {'id': 17, 'category': 'Neoclassical',},
-        {'id': 18, 'category': 'Minimalist',},
-    ]
-
-    _ATTR_MATERIAL = [
-        {'id': 0, 'category': 'Composition',},
-        {'id': 1, 'category': 'Cloth',},
-        {'id': 2, 'category': 'Leather',},
-        {'id': 3, 'category': 'Glass',},
-        {'id': 4, 'category': 'Metal',},
-        {'id': 5, 'category': 'Solid Wood',},
-        {'id': 6, 'category': 'Stone',},
-        {'id': 7, 'category': 'Plywood',},
-        {'id': 8, 'category': 'Others',},
-        {'id': 9, 'category': 'Suede',},
-        {'id': 10, 'category': 'Bamboo Rattan',},
-        {'id': 11, 'category': 'Rough Cloth',},
-        {'id': 12, 'category': 'Wood',},
-        {'id': 13, 'category': 'Composite Board',},
-        {'id': 14, 'category': 'Marble',},
-        {'id': 15, 'category': 'Smooth Leather',},
-    ]
-
-    _ATTR_THEME = [
-        {'id': 0, 'category': 'Smooth Net',},
-        {'id': 1, 'category': 'Lines',},
-        {'id': 2, 'category': 'Wrought Iron',},
-        {'id': 3, 'category': 'Cartoon',},
-        {'id': 4, 'category': 'Granite Texture',},
-        {'id': 5, 'category': 'Floral',},
-        {'id': 6, 'category': 'Inlay Gold Carve',},
-        {'id': 7, 'category': 'Texture Mark',},
-        {'id': 8, 'category': 'Striped Grid',},
-        {'id': 9, 'category': 'Chinese Pattern',},
-        {'id': 10, 'category': 'Gold Foil',},
-        {'id': 11, 'category': 'Rivet',},
-        {'id': 12, 'category': 'Soft Case',},
-        {'id': 13, 'category': 'Wooden Vertical Texture',},
-        {'id': 14, 'category': 'Graffiti Ink Stain',},
-        {'id': 15, 'category': 'Linen Texture',},
-=======
         {'id': 0, 'category': 'Modern', },
         {'id': 1, 'category': 'Chinoiserie', },
         {'id': 2, 'category': 'Kids', },
@@ -187,7 +107,6 @@ class Future3dDataset(CustomDataset):
         {'id': 13, 'category': 'Wooden Vertical Texture', },
         {'id': 14, 'category': 'Graffiti Ink Stain', },
         {'id': 15, 'category': 'Linen Texture', },
->>>>>>> shuang
     ]
 
     _SUPER_CATEGORIES_3D = [
@@ -232,20 +151,12 @@ class Future3dDataset(CustomDataset):
         {'id': 29, 'category': 'Sofa', 'fine-grained category name': 'L-shaped Sofa'},
         {'id': 30, 'category': 'Sofa', 'fine-grained category name': 'Lazy Sofa'},
         {'id': 31, 'category': 'Sofa', 'fine-grained category name': 'Chaise Longue Sofa'},
-<<<<<<< HEAD
-        {'id': 32, 'category': 'Pier/Stool', 'fine-grained category name': 'Footstool / Sofastool / Bed End Stool / Stool'},
-=======
         {'id': 32, 'category': 'Pier/Stool',
          'fine-grained category name': 'Footstool / Sofastool / Bed End Stool / Stool'},
->>>>>>> shuang
         {'id': 33, 'category': 'Lighting', 'fine-grained category name': 'Pendant Lamp'},
         {'id': 34, 'category': 'Lighting', 'fine-grained category name': 'Ceiling Lamp'}
     ]
 
-<<<<<<< HEAD
-
-=======
->>>>>>> shuang
     # original implementation of coco.py
     # self.cat_ids在test阶段会用到，我的理解是，self.cat_ids就是_CATEGORIES_3D里的'id'，对应1~34
     '''
@@ -260,10 +171,6 @@ class Future3dDataset(CustomDataset):
             info['filename'] = info['file_name']
             data_infos.append(info)
         return data_infos
-<<<<<<< HEAD
-
-=======
->>>>>>> shuang
     def get_ann_info(self, idx):
         img_id = self.data_infos[idx]['id']
         ann_ids = self.coco.getAnnIds(imgIds=[img_id])
@@ -277,25 +184,11 @@ class Future3dDataset(CustomDataset):
         for ann_item in json_data['annotations']:
             im_id = ann_item['image_id']
             if im_id not in im2ann_dict.keys():
-<<<<<<< HEAD
-                im2ann_dict[im_id] = [ann_item,]
-=======
                 im2ann_dict[im_id] = [ann_item, ]
->>>>>>> shuang
             else:
                 im2ann_dict[im_id].append(ann_item)
 
         return im2ann_dict
-<<<<<<< HEAD
-    
-    def load_annotations(self, ann_file):
-        self._json_data = mmcv.load(ann_file) #导入train_set.json或val_set.json
-        if 'train' in ann_file:
-            self.istrain = True #flag
-            self._im2ann_dict = self.init_img2ann_dict(self._json_data) #annotations下的image_id与annotations下的dict的映射
-            categories_data = self._json_data['categories'] #categories这个list
-            self._cate_dict = {_['id']: _ for _ in categories_data} #categories下的id与id所属的dict的键值对
-=======
 
     def load_annotations(self, ann_file):
         self._json_data = mmcv.load(ann_file)  # 导入train_set.json或val_set.json
@@ -304,27 +197,17 @@ class Future3dDataset(CustomDataset):
             self._im2ann_dict = self.init_img2ann_dict(self._json_data)  # annotations下的image_id与annotations下的dict的映射
             categories_data = self._json_data['categories']  # categories这个list
             self._cate_dict = {_['id']: _ for _ in categories_data}  # categories下的id与id所属的dict的键值对
->>>>>>> shuang
         else:
             self.istrain = False
             self._im2ann_dict = None
             self._cate_dict = None
-<<<<<<< HEAD
-        return self._json_data['images'] #v2.0的self.img_infos改名为self.data_infos，self.data_infos是images这个list
-=======
         return self._json_data['images']  # v2.0的self.img_infos改名为self.data_infos，self.data_infos是images这个list
->>>>>>> shuang
 
     def get_ann_info(self, idx):
         if not self.istrain:
             return None
-<<<<<<< HEAD
-        im_id = self.data_infos[idx]['id'] #images下的某个id，对应annotations里的image_id！
-        ann_list = self._im2ann_dict[im_id] #该id对应上述映射的某一项，是一个list，其中有1或多个dict，ann_list相当于原函数的ann_info了
-=======
         im_id = self.data_infos[idx]['id']  # images下的某个id，对应annotations里的image_id！
         ann_list = self._im2ann_dict[im_id]  # 该id对应上述映射的某一项，是一个list，其中有1或多个dict，ann_list相当于原函数的ann_info了
->>>>>>> shuang
         cate_ids = []
         cate_names = []
         fine_grained_cate_names = []
@@ -341,24 +224,6 @@ class Future3dDataset(CustomDataset):
         materials = []
         for i, ann_item in enumerate(ann_list):
             cate_id = ann_item['category_id']
-<<<<<<< HEAD
-            cate_ids.append(cate_id) #原函数有个cat2label操作，而且v2.0的cat2label的映射变了，这里我使用了devkit提供的_im2ann_dict函数
-            cate_names.append(self._cate_dict[cate_id]['category_name']) #默认是str，有需要的话可以根据上面新加的几个list转成int
-            fine_grained_cate_names.append(self._cate_dict[cate_id]['fine-grained category name']) #默认是str，有需要的话可以根据上面新加的几个list转成int
-            file_names.append(self.data_infos[idx]['file_name'] + '.jpg') #训练集中的image文件夹，file_name这项注释默认是不带后缀的
-            segms.append(ann_item['segmentation'])
-            areas.append(ann_item['area'])
-            x1, y1, w, h = ann_item['bbox']
-            bboxes.append([x1, y1, x1+w, y1+h]) #模仿了coco.py里_parse_ann_info函数的做法，注意！！新版不是'x1+w-1'了！
-            # 从model_id开始，后面的项都有可能是null
-            model_ids.append(ann_item['model_id']) #如"004062"，要用的话后缀加.obj
-            texture_ids.append(ann_item['texture_id']) #如"004062"，要用的话后缀加.png
-            poses.append(ann_item['pose']) #pose不是像比赛官网说的是一个list，而是一个dict，里面有translation(长度为3)和rotation(长度为3*3)两个list！
-            fovs.append(ann_item['fov']) #fov应该是视场角的意思，虽然我不知道怎么用进去:(
-            styles.append(ann_item['style']) #默认是str，有需要的话可以根据上面新加的几个list转成int
-            themes.append(ann_item['theme']) #默认是str，有需要的话可以根据上面新加的几个list转成int
-            materials.append(ann_item['material']) #默认是str，有需要的话可以根据上面新加的几个list转成int
-=======
             cate_ids.append(cate_id)  # 原函数有个cat2label操作，而且v2.0的cat2label的映射变了，这里我使用了devkit提供的_im2ann_dict函数
             cate_names.append(self._cate_dict[cate_id]['category_name'])  # 默认是str，有需要的话可以根据上面新加的几个list转成int
             fine_grained_cate_names.append(
@@ -376,17 +241,12 @@ class Future3dDataset(CustomDataset):
             styles.append(ann_item['style'])  # 默认是str，有需要的话可以根据上面新加的几个list转成int
             themes.append(ann_item['theme'])  # 默认是str，有需要的话可以根据上面新加的几个list转成int
             materials.append(ann_item['material'])  # 默认是str，有需要的话可以根据上面新加的几个list转成int
->>>>>>> shuang
 
             # 模仿_parse_ann_info，把bbox和label转化为np.array
             bboxes = np.array(bboxes, dtype=np.float32)
             cate_ids = np.array(cate_ids, dtype=np.int64)
 
-<<<<<<< HEAD
-            seg_map = self.data_infos[idx]['file_name'] + '.png' #训练集中的idmap文件夹
-=======
             seg_map = self.data_infos[idx]['file_name'] + '.png'  # 训练集中的idmap文件夹
->>>>>>> shuang
 
             # 这里上面的某些list我没放进去，大家看看需不需要增删
             ann = dict(
@@ -406,10 +266,6 @@ class Future3dDataset(CustomDataset):
 
             return ann
 
-<<<<<<< HEAD
-
-=======
->>>>>>> shuang
     def _filter_imgs(self, min_size=32):
         """Filter images too small or without ground truths."""
         valid_inds = []
@@ -424,20 +280,10 @@ class Future3dDataset(CustomDataset):
     # 如果不指定classes，这个函数似乎用不着？我暂时没改
     def get_subset_by_classes(self):
         """Get img ids that contain any category in class_ids.
-<<<<<<< HEAD
-
-        Different from the coco.getImgIds(), this function returns the id if
-        the img contains one of the categories rather than all.
-
-        Args:
-            class_ids (list[int]): list of category ids
-
-=======
         Different from the coco.getImgIds(), this function returns the id if
         the img contains one of the categories rather than all.
         Args:
             class_ids (list[int]): list of category ids
->>>>>>> shuang
         Return:
             ids (list[int]): integer list of img ids
         """
@@ -457,17 +303,9 @@ class Future3dDataset(CustomDataset):
     # 这个函数我整合到get_ann_info函数里了，用不着了
     def _parse_ann_info(self, img_info, ann_info):
         """Parse bbox and mask annotation.
-<<<<<<< HEAD
-
         Args:
             ann_info (list[dict]): Annotation info of an image.
             with_mask (bool): Whether to parse mask annotations.
-
-=======
-        Args:
-            ann_info (list[dict]): Annotation info of an image.
-            with_mask (bool): Whether to parse mask annotations.
->>>>>>> shuang
         Returns:
             dict: A dict containing the following keys: bboxes, bboxes_ignore,
                 labels, masks, seg_map. "masks" are raw annotations and not
@@ -597,17 +435,9 @@ class Future3dDataset(CustomDataset):
 
     def results2json(self, results, outfile_prefix):
         """Dump the detection results to a json file.
-<<<<<<< HEAD
-
         There are 3 types of results: proposals, bbox predictions, mask
         predictions, and they have different data types. This method will
         automatically recognize the type, and dump them to json files.
-
-=======
-        There are 3 types of results: proposals, bbox predictions, mask
-        predictions, and they have different data types. This method will
-        automatically recognize the type, and dump them to json files.
->>>>>>> shuang
         Args:
             results (list[list | tuple | ndarray]): Testing results of the
                 dataset.
@@ -615,10 +445,6 @@ class Future3dDataset(CustomDataset):
                 prefix is "somepath/xxx", the json files will be named
                 "somepath/xxx.bbox.json", "somepath/xxx.segm.json",
                 "somepath/xxx.proposal.json".
-<<<<<<< HEAD
-
-=======
->>>>>>> shuang
         Returns:
             dict[str: str]: Possible keys are "bbox", "segm", "proposal", and
                 values are corresponding filenames.
@@ -673,19 +499,11 @@ class Future3dDataset(CustomDataset):
 
     def format_results(self, results, jsonfile_prefix=None, **kwargs):
         """Format the results to json (standard format for COCO evaluation).
-<<<<<<< HEAD
-
-=======
->>>>>>> shuang
         Args:
             results (list): Testing results of the dataset.
             jsonfile_prefix (str | None): The prefix of json files. It includes
                 the file path and the prefix of filename, e.g., "a/b/prefix".
                 If not specified, a temp file will be created. Default: None.
-<<<<<<< HEAD
-
-=======
->>>>>>> shuang
         Returns:
             tuple: (result_files, tmp_dir), result_files is a dict containing
                 the json filepaths, tmp_dir is the temporal directory created
@@ -694,11 +512,7 @@ class Future3dDataset(CustomDataset):
         assert isinstance(results, list), 'results must be a list'
         assert len(results) == len(self), (
             'The length of results is not equal to the dataset len: {} != {}'.
-<<<<<<< HEAD
-            format(len(results), len(self)))
-=======
                 format(len(results), len(self)))
->>>>>>> shuang
 
         if jsonfile_prefix is None:
             tmp_dir = tempfile.TemporaryDirectory()
@@ -717,10 +531,6 @@ class Future3dDataset(CustomDataset):
                  proposal_nums=(100, 300, 1000),
                  iou_thrs=np.arange(0.5, 0.96, 0.05)):
         """Evaluation in COCO protocol.
-<<<<<<< HEAD
-
-=======
->>>>>>> shuang
         Args:
             results (list): Testing results of the dataset.
             metric (str | list[str]): Metrics to be evaluated.
@@ -736,10 +546,6 @@ class Future3dDataset(CustomDataset):
             iou_thrs (Sequence[float]): IoU threshold used for evaluating
                 recalls. If set to a list, the average recall of all IoUs will
                 also be computed. Default: 0.5.
-<<<<<<< HEAD
-
-=======
->>>>>>> shuang
         Returns:
             dict[str: float]
         """

@@ -32,7 +32,9 @@ class Future3dDataset(CustomDataset):
         'Footstool / Sofastool / Bed End Stool / Stool', 'Pendant Lamp', 'Ceiling Lamp'
     )
 
-    
+    # original implementation of coco.py
+    # self.cat_ids在test阶段会用到，我的理解是，self.cat_ids就是_CATEGORIES_3D里的'id'，对应1~34
+    '''
     def load_annotations(self, ann_file):
         self.coco = COCO(ann_file)
         self.cat_ids = self.coco.getCatIds(catNms=self.CLASSES)
@@ -41,28 +43,116 @@ class Future3dDataset(CustomDataset):
         data_infos = []
         for i in self.img_ids:
             info = self.coco.loadImgs([i])[0]
-            info['filename'] = info['file_name'] + '.jpg'
+            info['filename'] = info['file_name']
             data_infos.append(info)
         return data_infos
-    
     def get_ann_info(self, idx):
         img_id = self.data_infos[idx]['id']
         ann_ids = self.coco.getAnnIds(imgIds=[img_id])
         ann_info = self.coco.loadAnns(ann_ids)
         return self._parse_ann_info(self.data_infos[idx], ann_info)
-    
+    '''
+
+    # 来自Future3dDataset.py
+    def init_img2ann_dict(self, json_data):
+        im2ann_dict = {}
+        for ann_item in json_data['annotations']:
+            im_id = ann_item['image_id']
+            if im_id not in im2ann_dict.keys():
+                im2ann_dict[im_id] = [ann_item, ]
+            else:
+                im2ann_dict[im_id].append(ann_item)
+
+        return im2ann_dict
+
+    def load_annotations(self, ann_file):
+        self._json_data = mmcv.load(ann_file)  # 导入train_set.json或val_set.json
+        if 'train' in ann_file:
+            self.istrain = True  # flag
+            self._im2ann_dict = self.init_img2ann_dict(self._json_data)  # annotations下的image_id与annotations下的dict的映射
+            categories_data = self._json_data['categories']  # categories这个list
+            self._cate_dict = {_['id']: _ for _ in categories_data}  # categories下的id与id所属的dict的键值对
+        else:
+            self.istrain = False
+            self._im2ann_dict = None
+            self._cate_dict = None
+        return self._json_data['images']  # v2.0的self.img_infos改名为self.data_infos，self.data_infos是images这个list
+
+    def get_ann_info(self, idx):
+        if not self.istrain:
+            return None
+        im_id = self.data_infos[idx]['id']  # images下的某个id，对应annotations里的image_id！
+        ann_list = self._im2ann_dict[im_id]  # 该id对应上述映射的某一项，是一个list，其中有1或多个dict，ann_list相当于原函数的ann_info了
+        cate_ids = []
+        cate_names = []
+        fine_grained_cate_names = []
+        file_names = []
+        segms = []
+        areas = []
+        bboxes = []
+        model_ids = []
+        texture_ids = []
+        poses = []
+        fovs = []
+        styles = []
+        themes = []
+        materials = []
+        for i, ann_item in enumerate(ann_list):
+            cate_id = ann_item['category_id']
+            cate_ids.append(cate_id)  # 原函数有个cat2label操作，而且v2.0的cat2label的映射变了，这里我使用了devkit提供的_im2ann_dict函数
+            cate_names.append(self._cate_dict[cate_id]['category_name'])  # 默认是str，有需要的话可以根据上面新加的几个list转成int
+            fine_grained_cate_names.append(
+                self._cate_dict[cate_id]['fine-grained category name'])  # 默认是str，有需要的话可以根据上面新加的几个list转成int
+            file_names.append(self.data_infos[idx]['file_name'] + '.jpg')  # 训练集中的image文件夹，file_name这项注释默认是不带后缀的
+            segms.append(ann_item['segmentation'])
+            areas.append(ann_item['area'])
+            x1, y1, w, h = ann_item['bbox']
+            bboxes.append([x1, y1, x1 + w, y1 + h])  # 模仿了coco.py里_parse_ann_info函数的做法，注意！！新版不是'x1+w-1'了！
+            # 从model_id开始，后面的项都有可能是null
+            model_ids.append(ann_item['model_id'])  # 如"004062"，要用的话后缀加.obj
+            texture_ids.append(ann_item['texture_id'])  # 如"004062"，要用的话后缀加.png
+            poses.append(ann_item['pose'])  # pose不是像比赛官网说的是一个list，而是一个dict，里面有translation(长度为3)和rotation(长度为3*3)两个list！
+            fovs.append(ann_item['fov'])  # fov应该是视场角的意思，虽然我不知道怎么用进去:(
+            styles.append(ann_item['style'])  # 默认是str，有需要的话可以根据上面新加的几个list转成int
+            themes.append(ann_item['theme'])  # 默认是str，有需要的话可以根据上面新加的几个list转成int
+            materials.append(ann_item['material'])  # 默认是str，有需要的话可以根据上面新加的几个list转成int
+
+            # 模仿_parse_ann_info，把bbox和label转化为np.array
+            bboxes = np.array(bboxes, dtype=np.float32)
+            cate_ids = np.array(cate_ids, dtype=np.int64)
+
+            seg_map = self.data_infos[idx]['file_name'] + '.png'  # 训练集中的idmap文件夹
+
+            # 这里上面的某些list我没放进去，大家看看需不需要增删
+            ann = dict(
+                labels=cate_ids,
+                masks=segms,
+                areas=areas,
+                bboxes=bboxes,
+                model_ids=model_ids,
+                texture_ids=texture_ids,
+                poses=poses,
+                fovs=fovs,
+                styles=styles,
+                themes=themes,
+                materials=materials,
+                seg_map=seg_map
+            )
+
+            return ann
 
     def _filter_imgs(self, min_size=32):
         """Filter images too small or without ground truths."""
         valid_inds = []
-        ids_with_ann = set(_['image_id'] for _ in self.coco.anns.values())
+        ids_with_ann = set(_['image_id'] for _ in self._json_data['annotations'])
         for i, img_info in enumerate(self.data_infos):
-            if self.filter_empty_gt and self.img_ids[i] not in ids_with_ann:
+            if self.filter_empty_gt and img_info['id'] not in ids_with_ann:
                 continue
             if min(img_info['width'], img_info['height']) >= min_size:
                 valid_inds.append(i)
         return valid_inds
 
+    # 如果不指定classes，这个函数似乎用不着？我暂时没改
     def get_subset_by_classes(self):
         """Get img ids that contain any category in class_ids.
         Different from the coco.getImgIds(), this function returns the id if
@@ -85,6 +175,7 @@ class Future3dDataset(CustomDataset):
             data_infos.append(info)
         return data_infos
 
+    # 这个函数我整合到get_ann_info函数里了，用不着了
     def _parse_ann_info(self, img_info, ann_info):
         """Parse bbox and mask annotation.
         Args:
@@ -139,13 +230,15 @@ class Future3dDataset(CustomDataset):
 
         return ann
 
+    # 以下应该是test的任务？请注意self.cat_ids！
+
     def xyxy2xywh(self, bbox):
         _bbox = bbox.tolist()
         return [
             _bbox[0],
             _bbox[1],
-            _bbox[2] - _bbox[0],
-            _bbox[3] - _bbox[1],
+            _bbox[2] - _bbox[0] + 1,
+            _bbox[3] - _bbox[1] + 1,
         ]
 
     def _proposal2json(self, results):
@@ -210,18 +303,16 @@ class Future3dDataset(CustomDataset):
                     data['score'] = float(mask_score[i])
                     data['category_id'] = self.cat_ids[label]
                     if isinstance(segms[i]['counts'], bytes):
-                        segms[i]['counts'] = segms[i]['counts'].decode('ascii')
+                        segms[i]['counts'] = segms[i]['counts'].decode()
                     data['segmentation'] = segms[i]
                     segm_json_results.append(data)
         return bbox_json_results, segm_json_results
 
     def results2json(self, results, outfile_prefix):
         """Dump the detection results to a json file.
-
         There are 3 types of results: proposals, bbox predictions, mask
         predictions, and they have different data types. This method will
         automatically recognize the type, and dump them to json files.
-
         Args:
             results (list[list | tuple | ndarray]): Testing results of the
                 dataset.
@@ -229,7 +320,6 @@ class Future3dDataset(CustomDataset):
                 prefix is "somepath/xxx", the json files will be named
                 "somepath/xxx.bbox.json", "somepath/xxx.segm.json",
                 "somepath/xxx.proposal.json".
-
         Returns:
             dict[str: str]: Possible keys are "bbox", "segm", "proposal", and
                 values are corresponding filenames.
@@ -237,21 +327,22 @@ class Future3dDataset(CustomDataset):
         result_files = dict()
         if isinstance(results[0], list):
             json_results = self._det2json(results)
-            result_files['bbox'] = f'{outfile_prefix}.bbox.json'
-            result_files['proposal'] = f'{outfile_prefix}.bbox.json'
+            result_files['bbox'] = '{}.{}.json'.format(outfile_prefix, 'bbox')
+            result_files['proposal'] = '{}.{}.json'.format(
+                outfile_prefix, 'bbox')
             mmcv.dump(json_results, result_files['bbox'])
         elif isinstance(results[0], tuple):
             json_results = self._segm2json(results)
-            result_files['bbox'] = f'{outfile_prefix}.bbox.json'
-            result_files['proposal'] = f'{outfile_prefix}.bbox.json'
-            result_files['segm'] = f'{outfile_prefix}.segm.json'
+            result_files['bbox'] = '{}.{}.json'.format(outfile_prefix, 'bbox')
+            result_files['proposal'] = '{}.{}.json'.format(
+                outfile_prefix, 'bbox')
+            result_files['segm'] = '{}.{}.json'.format(outfile_prefix, 'segm')
             mmcv.dump(json_results[0], result_files['bbox'])
-            # competition json format
-            _segm_result = {"annotations": json_results[1]}
-            mmcv.dump(_segm_result, result_files['segm'])
+            mmcv.dump(json_results[1], result_files['segm'])
         elif isinstance(results[0], np.ndarray):
             json_results = self._proposal2json(results)
-            result_files['proposal'] = f'{outfile_prefix}.proposal.json'
+            result_files['proposal'] = '{}.{}.json'.format(
+                outfile_prefix, 'proposal')
             mmcv.dump(json_results, result_files['proposal'])
         else:
             raise TypeError('invalid type of results')
@@ -270,7 +361,7 @@ class Future3dDataset(CustomDataset):
                 if ann.get('ignore', False) or ann['iscrowd']:
                     continue
                 x1, y1, w, h = ann['bbox']
-                bboxes.append([x1, y1, x1 + w, y1 + h])
+                bboxes.append([x1, y1, x1 + w - 1, y1 + h - 1])
             bboxes = np.array(bboxes, dtype=np.float32)
             if bboxes.shape[0] == 0:
                 bboxes = np.zeros((0, 4))
@@ -283,13 +374,11 @@ class Future3dDataset(CustomDataset):
 
     def format_results(self, results, jsonfile_prefix=None, **kwargs):
         """Format the results to json (standard format for COCO evaluation).
-
         Args:
             results (list): Testing results of the dataset.
             jsonfile_prefix (str | None): The prefix of json files. It includes
                 the file path and the prefix of filename, e.g., "a/b/prefix".
                 If not specified, a temp file will be created. Default: None.
-
         Returns:
             tuple: (result_files, tmp_dir), result_files is a dict containing
                 the json filepaths, tmp_dir is the temporal directory created
@@ -298,7 +387,7 @@ class Future3dDataset(CustomDataset):
         assert isinstance(results, list), 'results must be a list'
         assert len(results) == len(self), (
             'The length of results is not equal to the dataset len: {} != {}'.
-            format(len(results), len(self)))
+                format(len(results), len(self)))
 
         if jsonfile_prefix is None:
             tmp_dir = tempfile.TemporaryDirectory()
@@ -317,7 +406,6 @@ class Future3dDataset(CustomDataset):
                  proposal_nums=(100, 300, 1000),
                  iou_thrs=np.arange(0.5, 0.96, 0.05)):
         """Evaluation in COCO protocol.
-
         Args:
             results (list): Testing results of the dataset.
             metric (str | list[str]): Metrics to be evaluated.
@@ -333,7 +421,6 @@ class Future3dDataset(CustomDataset):
             iou_thrs (Sequence[float]): IoU threshold used for evaluating
                 recalls. If set to a list, the average recall of all IoUs will
                 also be computed. Default: 0.5.
-
         Returns:
             dict[str: float]
         """
@@ -342,14 +429,14 @@ class Future3dDataset(CustomDataset):
         allowed_metrics = ['bbox', 'segm', 'proposal', 'proposal_fast']
         for metric in metrics:
             if metric not in allowed_metrics:
-                raise KeyError(f'metric {metric} is not supported')
+                raise KeyError('metric {} is not supported'.format(metric))
 
         result_files, tmp_dir = self.format_results(results, jsonfile_prefix)
 
         eval_results = {}
         cocoGt = self.coco
         for metric in metrics:
-            msg = f'Evaluating {metric}...'
+            msg = 'Evaluating {}...'.format(metric)
             if logger is None:
                 msg = '\n' + msg
             print_log(msg, logger=logger)
@@ -359,16 +446,16 @@ class Future3dDataset(CustomDataset):
                     results, proposal_nums, iou_thrs, logger='silent')
                 log_msg = []
                 for i, num in enumerate(proposal_nums):
-                    eval_results[f'AR@{num}'] = ar[i]
-                    log_msg.append(f'\nAR@{num}\t{ar[i]:.4f}')
+                    eval_results['AR@{}'.format(num)] = ar[i]
+                    log_msg.append('\nAR@{}\t{:.4f}'.format(num, ar[i]))
                 log_msg = ''.join(log_msg)
                 print_log(log_msg, logger=logger)
                 continue
 
             if metric not in result_files:
-                raise KeyError(f'{metric} is not in results')
+                raise KeyError('{} is not in results'.format(metric))
             try:
-                cocoDt = cocoGt.loadEntireRes(result_files[metric])
+                cocoDt = cocoGt.loadRes(result_files[metric])
             except IndexError:
                 print_log(
                     'The testing results of the whole dataset is empty.',
@@ -378,7 +465,6 @@ class Future3dDataset(CustomDataset):
 
             iou_type = 'bbox' if metric == 'proposal' else metric
             cocoEval = COCOeval(cocoGt, cocoDt, iou_type)
-            cocoEval.params.catIds = self.cat_ids
             cocoEval.params.imgIds = self.img_ids
             if metric == 'proposal':
                 cocoEval.params.useCats = 0
@@ -391,57 +477,24 @@ class Future3dDataset(CustomDataset):
                     'AR_l@1000'
                 ]
                 for i, item in enumerate(metric_items):
-                    val = float(f'{cocoEval.stats[i + 6]:.3f}')
+                    val = float('{:.3f}'.format(cocoEval.stats[i + 6]))
                     eval_results[item] = val
             else:
                 cocoEval.evaluate()
                 cocoEval.accumulate()
                 cocoEval.summarize()
                 if classwise:  # Compute per-category AP
-                    # Compute per-category AP
-                    # from https://github.com/facebookresearch/detectron2/
-                    precisions = cocoEval.eval['precision']
-                    # precision: (iou, recall, cls, area range, max dets)
-                    assert len(self.cat_ids) == precisions.shape[2]
-
-                    results_per_category = []
-                    for idx, catId in enumerate(self.cat_ids):
-                        # area range index 0: all area ranges
-                        # max dets index -1: typically 100 per image
-                        nm = self.coco.loadCats(catId)[0]
-                        precision = precisions[:, :, idx, 0, -1]
-                        precision = precision[precision > -1]
-                        if precision.size:
-                            ap = np.mean(precision)
-                        else:
-                            ap = float('nan')
-                        results_per_category.append(
-                            (f'{nm["name"]}', f'{float(ap):0.3f}'))
-
-                    num_columns = min(6, len(results_per_category) * 2)
-                    results_flatten = list(
-                        itertools.chain(*results_per_category))
-                    headers = ['category', 'AP'] * (num_columns // 2)
-                    results_2d = itertools.zip_longest(*[
-                        results_flatten[i::num_columns]
-                        for i in range(num_columns)
-                    ])
-                    table_data = [headers]
-                    table_data += [result for result in results_2d]
-                    table = AsciiTable(table_data)
-                    print_log('\n' + table.table, logger=logger)
-
+                    pass  # TODO
                 metric_items = [
                     'mAP', 'mAP_50', 'mAP_75', 'mAP_s', 'mAP_m', 'mAP_l'
                 ]
                 for i in range(len(metric_items)):
-                    key = f'{metric}_{metric_items[i]}'
-                    val = float(f'{cocoEval.stats[i]:.3f}')
+                    key = '{}_{}'.format(metric, metric_items[i])
+                    val = float('{:.3f}'.format(cocoEval.stats[i]))
                     eval_results[key] = val
-                ap = cocoEval.stats[:6]
-                eval_results[f'{metric}_mAP_copypaste'] = (
-                    f'{ap[0]:.3f} {ap[1]:.3f} {ap[2]:.3f} {ap[3]:.3f} '
-                    f'{ap[4]:.3f} {ap[5]:.3f}')
+                eval_results['{}_mAP_copypaste'.format(metric)] = (
+                    '{ap[0]:.3f} {ap[1]:.3f} {ap[2]:.3f} {ap[3]:.3f} '
+                    '{ap[4]:.3f} {ap[5]:.3f}').format(ap=cocoEval.stats[:6])
         if tmp_dir is not None:
             tmp_dir.cleanup()
         return eval_results

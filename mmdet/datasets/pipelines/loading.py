@@ -16,16 +16,15 @@ class LoadImageFromFile(object):
         self.color_type = color_type
 
     def __call__(self, results):
-        # shuang修改，改了三处filename ->file_name, 并且加上 '.jpg'
         if results['img_prefix'] is not None:
             filename = osp.join(results['img_prefix'],
-                                results['img_info']['file_name']) + '.jpg'
+                                results['img_info']['filename'])
         else:
-            filename = results['img_info']['file_name'] + '.jpg'
+            filename = results['img_info']['filename']
         img = mmcv.imread(filename, self.color_type)
         if self.to_float32:
             img = img.astype(np.float32)
-        results['file_name'] = filename
+        results['filename'] = filename
         results['img'] = img
         results['img_shape'] = img.shape
         results['ori_shape'] = img.shape

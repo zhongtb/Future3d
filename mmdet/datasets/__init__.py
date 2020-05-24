@@ -4,7 +4,8 @@ from .coco import CocoDataset
 # ck修改
 from .Future3d import Future3dDataset
 from .custom import CustomDataset
-from .dataset_wrappers import ConcatDataset, RepeatDataset
+from .dataset_wrappers import (ClassBalancedDataset, ConcatDataset,
+                               RepeatDataset)
 from .samplers import DistributedGroupSampler, DistributedSampler, GroupSampler
 from .voc import VOCDataset
 from .wider_face import WIDERFaceDataset
@@ -15,5 +16,6 @@ __all__ = [
     'CustomDataset', 'XMLDataset', 'CocoDataset', 'Future3dDataset', 'VOCDataset',
     'CityscapesDataset', 'GroupSampler', 'DistributedGroupSampler',
     'DistributedSampler', 'build_dataloader', 'ConcatDataset', 'RepeatDataset',
-    'WIDERFaceDataset', 'DATASETS', 'PIPELINES', 'build_dataset'
+    'ClassBalancedDataset', 'WIDERFaceDataset', 'DATASETS', 'PIPELINES',
+    'build_dataset'
 ]

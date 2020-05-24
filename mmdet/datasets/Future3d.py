@@ -8,8 +8,8 @@ import tempfile
 import mmcv
 import numpy as np
 from mmcv.utils import print_log
-from pycocotools.coco import COCO
-from pycocotools.cocoeval import COCOeval
+from .future3d_utils.coco import COCO
+from .future3d_utils.cocoeval import COCOeval
 from terminaltables import AsciiTable
 
 from mmdet.core import eval_recalls

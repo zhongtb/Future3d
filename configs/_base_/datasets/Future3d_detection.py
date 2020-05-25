@@ -36,10 +36,9 @@ test_pipeline = [
             dict(type='Collect', keys=['img']),
         ])
 ]
-# shuang修改
 data = dict(
-    samples_per_gpu=2,
-    workers_per_gpu=2,
+    samples_per_gpu=1,
+    workers_per_gpu=1,
     train=dict(
         type=dataset_type,
         ann_file=data_root + 'train/devkit/train_set.json',

@@ -11,7 +11,7 @@ model = dict(
     backbone=dict(
         type='ResNeSt', # TODO: Unfinished, wait for official implementation, or use SENet, CBNet, etc.
         depth=200,
-        # TODO: any arguments missing here?
+        # TODO: if ResNeSt, there should be some other parameters
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
@@ -21,7 +21,7 @@ model = dict(
         dcn=dict(type='DCN', deformable_groups=1, fallback_on_stride=False),
         stage_with_dcn=(False, True, True, True)),
     neck=dict(
-        type='FPN', # Any other, e.g., pafpn?
+        type='FPN', # Any other, e.g., pafpn, SEPC?
         in_channels=[256, 512, 1024, 2048],
         out_channels=256,
         num_outs=5),
@@ -54,7 +54,7 @@ model = dict(
             featmap_strides=[4, 8, 16, 32]),
         bbox_head=[
             dict(
-                type='Shared2FCBBoxHead',
+                type='Shared2FCBBoxHead', # TSD?
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
@@ -146,7 +146,7 @@ train_cfg = dict(
             min_pos_iou=0.3,
             ignore_iof_thr=-1),
         sampler=dict(
-            type='RandomSampler', # Any other, e.g., OHEM?
+            type='RandomSampler',
             num=256,
             pos_fraction=0.5,
             neg_pos_ub=-1,
@@ -170,7 +170,7 @@ train_cfg = dict(
                 min_pos_iou=0.5,
                 ignore_iof_thr=-1),
             sampler=dict(
-                type='RandomSampler', # Any other, e.g., OHEM?
+                type='RandomSampler',
                 num=512,
                 pos_fraction=0.25,
                 neg_pos_ub=-1,
